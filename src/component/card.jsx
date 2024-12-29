@@ -1,61 +1,91 @@
-import React, { useEffect, useState } from 'react';
-import Button from 'react-bootstrap/Button';
-import Card from 'react-bootstrap/Card';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import React, { useState, useEffect } from 'react';
+import { GoSun } from "react-icons/go";
+import { FaMoon } from "react-icons/fa";
+
+function ThemeToggle({ isDarkMode, changeTheme }) {
+    return (
+        <div className="absolute top-4 right-4">
+            <label className="cursor-pointer">
+                <input
+                    onClick={changeTheme}
+                    className="hidden"
+                    type="checkbox"
+                />
+                {isDarkMode ? (
+                    <FaMoon size={30} />
+                ) : (
+                    <GoSun size={30} />
+                )}
+            </label>
+        </div>
+    );
+}
 
 function ProductCard() {
     const [data, setData] = useState([]);
+    const [isDarkMode, setDarkMode] = useState(false); 
 
+    
     useEffect(() => {
         const fetchData = async () => {
             const res = await fetch("https://fakestoreapi.com/products");
             const data = await res.json();
-            console.log(data);
             setData(data);
         };
         fetchData();
-    }, []); // Dependency array to ensure effect runs only once
+    }, []);
+
+    // Toggle the theme mode
+    function changeTheme() {
+        setDarkMode(!isDarkMode);
+    }
 
     return (
-        <Container className="mt-4 row">
-            <div className='flex col-12 sm-col-2 md:col-3 lg-col-4'>
-                {data.map((item) => (
-                    <div key={item.id} className="mb-4">
-                        <Card style={{ width: '100%', height: '100%' }}>
-                            <div
-                                style={{
-                                    height: '200px',
-                                    overflow: 'hidden',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <Card.Img
-                                    variant="top"
+        <div
+            className={`transition-all duration-500 ${
+                isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'
+            }`}
+        >
+          
+            <ThemeToggle isDarkMode={isDarkMode} changeTheme={changeTheme} />
+
+            <header className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4">
+                <div className="container mx-auto text-center">
+                    <h1 className="text-2xl md:text-4xl font-bold mb-4">Welcome to ShopEasy</h1>
+                    <p className="text-sm md:text-lg">Explore the best products at unbeatable prices!</p>
+                </div>
+            </header>
+
+            {/* Products Section */}
+            <div className="container mx-auto mt-8">
+                <h2 className="text-2xl font-bold text-center mb-6">Our Top Products</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mx-2 md:mx-4">
+                    {data.map((item) => (
+                        <div
+                            key={item.id}
+                            className="bg-white shadow-lg rounded-lg overflow-hidden flex flex-col h-full justify-center items-center gap-2 transform hover:scale-105 transition duration-300"
+                        >
+                            <div className="h-40 flex items-center justify-center bg-gray-100">
+                                <img
                                     src={item.image}
                                     alt={item.title}
-                                    style={{
-                                        maxHeight: '100%',
-                                        maxWidth: '100%',
-                                        objectFit: 'contain',
-                                    }}
+                                    className="max-h-full max-w-full object-contain"
                                 />
                             </div>
-                            <Card.Body>
-                                <Card.Title>{item.title}</Card.Title>
-                                <Card.Text>
+                            <div className="p-4 flex flex-col flex-grow">
+                                <h3 className="text-base font-semibold text-center mb-2">{item.title}</h3>
+                                <p className="text-gray-700 text-xs text-center flex-grow">
                                     {item.description.substring(0, 100)}...
-                                </Card.Text>
-                                <Button variant="primary">Buy Now</Button>
-                            </Card.Body>
-                        </Card>
-                    </div>
-                ))}
+                                </p>
+                                <button className="mt-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-2 px-4 rounded hover:from-indigo-600 hover:to-blue-500 transition">
+                                    Buy Now
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
-        </Container>
+        </div>
     );
 }
 
